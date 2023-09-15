@@ -138,8 +138,3 @@ def transfer_file(sp, rp, sf, rf):
     trans = TmuxTransfer(0, 0, sp, rp)
     trans.transfer(sf, rf)
 
-
-if __name__ == "__main__":
-    trans = TmuxTransfer(0, 0, 1, 2, 0, 0)
-
-    trans.transfer("/usr/bin/touch", "/tmp/tt")
