@@ -51,19 +51,33 @@ class TmuxTransfer:
     def id(self):
         return uuid.uuid4().hex
 
-    def get_text(self, pane, idx):
+    def get_text(self, pane, idx, timeout=1):
         """Get a specific output text
         Each send_key command has a idx which is wrapped around the output.
         """
-        self.capture_buffer(pane)
-        buf = self.get_buffer()
-        return get_between(buf, f"#START{idx}", f"#END{idx}")
+        
+        r = ""
+        start_time = time.time()
+
+        while True:
+            self.capture_buffer(pane)
+            buf = self.get_buffer()
+            r = get_between(buf, f"#START{idx}", f"#END{idx}")
+
+            if r != "":
+                break
+
+            if time.time() - start_time > timeout:
+                break
+
+            time.sleep(0.1)
+
+        return r
 
     def check_file(self, path):
         """Check if file exists or if we can access it"""
         idx = self.frsend_keys(f"ls {path}")
 
-        time.sleep(0.1)
         r = self.get_text(self.frpane, idx)
         if "cannot access" in r:
             return False
@@ -109,7 +123,6 @@ class TmuxTransfer:
             idx = self.frsend_keys(
                 f"base64 {file} | head -n {pointer} | tail -n {bulk}"
             )
-            time.sleep(0.1)
             r = self.get_text(self.frpane, idx)
 
             buf += r
@@ -127,7 +140,7 @@ class TmuxTransfer:
     def has_base64(self):
         """Checks if sender has base64 binary installed"""
         idx = self.frsend_keys("which base64")
-        time.sleep(0.1)
+        
         if len(self.get_text(self.frpane, idx).strip()) > 0:
             return True
 
