@@ -60,12 +60,13 @@ class TmuxTransfer:
         start_time = time.time()
 
         while True:
+            if r != "":
+                break
+
             self.capture_buffer(pane)
             buf = self.get_buffer()
             r = get_between(buf, f"#START{idx}", f"#END{idx}")
 
-            if r != "":
-                break
 
             if time.time() - start_time > timeout:
                 break
