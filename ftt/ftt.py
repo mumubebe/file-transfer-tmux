@@ -62,7 +62,7 @@ class TmuxTransfer:
         while True:
             if r != "":
                 break
-
+            
             self.capture_buffer(pane)
             buf = self.get_buffer()
             r = get_between(buf, f"#START{idx}", f"#END{idx}")
@@ -127,7 +127,7 @@ class TmuxTransfer:
             r = self.get_text(self.frpane, idx)
 
             buf += r
-            if pointer == nlines:
+            if pointer >= nlines:
                 break
 
             # Last bulk
